@@ -4,13 +4,13 @@ import { getAuth } from 'firebase/auth';
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDP2Ef5KhhDkN4mnBdXajBPdxrCHGsKRXw",
-    authDomain: "tailorshopapp-9c946.firebaseapp.com",
-    projectId: "tailorshopapp-9c946",
-    storageBucket: "tailorshopapp-9c946.appspot.com",
-    messagingSenderId: "140367440579",
-    appId: "1:140367440579:web:263565fc92529907001076",
-    measurementId: "G-ZYK4LFTY42"
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: "",
+    measurementId: ""
 };
 
 // Initialize Firebase
