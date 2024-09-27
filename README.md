@@ -29,11 +29,11 @@ Welcome to the **Online Tailor Shop** project! This application is designed to p
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/online-tailor-shop.git
+   git clone https://github.com/yourusername/tailor-shop.git
 2. Navigate to the project directory:
 
 ```bash
-cd online-tailor-shop
+cd tailor-shop
 ```
 3. Install the dependencies:
 
@@ -56,7 +56,7 @@ npm start
 ```
 The app will be available at http://localhost:3000.
 
-*** Building for Production
+### Building for Production
 
 To create a production build of the app, run:
 
