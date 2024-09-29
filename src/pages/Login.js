@@ -1,38 +1,33 @@
-// RegistrationPage.js
+// src/Login.js
 import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from 'react-router-dom';
 
-const RegistrationPage = () => {
+const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (password !== confirmPassword) {
-            setError('Passwords do not match');
-            return;
-        }
-
-        const auth = getAuth();
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            console.log('User registered:', userCredential.user);
-            setSuccess(true);
-            setError(null);
-        } catch (err) {
-            setError(err.message);
+            await signInWithEmailAndPassword(auth, email, password);
+            setEmail('');
+            setPassword('');
+            setError('');
+            alert("Login successful!");
+            navigate('/products');
+        } catch (error) {
+            setError(error.message);
         }
     };
 
     return (
         <div style={styles.container}>
-            <h2>Register</h2>
-            {error && <p style={styles.error}>{error}</p>}
-            {success && <p style={styles.success}>Registration Successful!</p>}
+            <h2>Login</h2>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit} style={styles.form}>
                 <div style={styles.formGroup}>
                     <label>Email:</label>
@@ -40,8 +35,8 @@ const RegistrationPage = () => {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        required
                         style={styles.input}
+                        required
                     />
                 </div>
                 <div style={styles.formGroup}>
@@ -50,26 +45,15 @@ const RegistrationPage = () => {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
                         style={styles.input}
+                        required
                     />
                 </div>
-                <div style={styles.formGroup}>
-                    <label>Confirm Password:</label>
-                    <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                        style={styles.input}
-                    />
-                </div>
-                <button type="submit" style={styles.button}>Register</button>
+                <button type="submit" style={styles.button}>Login</button>
             </form>
         </div>
     );
 };
-
 const styles = {
     container: {
         maxWidth: '400px',
@@ -84,7 +68,7 @@ const styles = {
     form: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '10px',
+        gap: '10px'
     },
     formGroup: {
         display: 'flex',
@@ -101,12 +85,13 @@ const styles = {
     button: {
         padding: '10px',
         fontSize: '1em',
-        backgroundColor: '#60BFC1',
-        color: '#fff',
+        backgroundColor: '#B2C9E5',
+        color: 'black',
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
-        marginTop: '10px'
+        marginTop: '10px',
+        fontWeight: 'bold'
     },
     error: {
         color: 'red',
@@ -118,4 +103,4 @@ const styles = {
     }
 };
 
-export default RegistrationPage;
+export default Login;
