@@ -2,6 +2,8 @@
 
 Welcome to the **Online Tailor Shop** project! This application is designed to provide users with a seamless experience for customizing and ordering tailor-made clothing. Built with React.js and Firebase, this app offers a modern interface and real-time data management.
 
+color pallete: https://colorhunt.co/palette/b7e0fffff5cdffcfb3e78f81
+
 ## Features
 
 - User registration and authentication
