@@ -6,9 +6,9 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Registration from './pages/CustomerRegistration';
 import ProductList from './pages/ProductList';
-
+import Orders from './pages/Orders';
+import UserProfile from './pages/UserProfile';
 import AddProduct from './pages/AddProduct';
-
 import { AuthProvider } from './context/AuthContext'; // Import AuthProvider
 
 const App = () => {
@@ -22,7 +22,8 @@ const App = () => {
           <Route path="/registration" element={<Registration />} />
           <Route path="/products" element={<ProductList />} />
           <Route path="/add" element={<AddProduct />} />
-
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/profile" element={<UserProfile />} />
         </Routes>
       </Router>
     </AuthProvider>

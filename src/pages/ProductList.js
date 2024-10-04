@@ -1,22 +1,35 @@
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase'; // Firestore instance
+import { auth, db } from '../firebase';
 
 const ProductList = () => {
-    const [products, setProducts] = useState([]); // useState is used here
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    useEffect(() => { // useEffect is used here
+    useEffect(() => {
         const fetchProducts = async () => {
+            setLoading(true);
+            setError(null);
             try {
+                if (!auth.currentUser) {
+                    setError('You must be logged in to view products.');
+                    setLoading(false);
+                    return;
+                }
+
                 const querySnapshot = await getDocs(collection(db, 'product'));
                 const productsData = querySnapshot.docs.map(doc => ({
-                    id: doc.id,  // Firestore automatically generates document ID
-                    ...doc.data(), // Product data including name, description, price, image_url
+                    id: doc.id,
+                    ...doc.data(),
                 }));
                 setProducts(productsData);
             } catch (error) {
                 console.error("Error fetching products: ", error);
+                setError('Failed to fetch products. Please try again later.'); // Update error state
+            } finally {
+                setLoading(false); // Ensure loading state is reset
             }
         };
 
@@ -25,7 +38,9 @@ const ProductList = () => {
 
     return (
         <div style={styles.productList}>
-            {products.map(product => (
+            {loading && <p>Loading products...</p>}
+            {error && <p>{error}</p>}
+            {!loading && !error && products.map(product => (
                 <ProductCard key={product.id} product={product} />
             ))}
         </div>

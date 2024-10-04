@@ -1,12 +1,19 @@
-// RegistrationPage.js
 import React, { useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { db } from '../firebase';
 
 const RegistrationPage = () => {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [role, setRole] = useState('customer'); // Default role
+    const [address, setAddress] = useState('');
+    const [city, setCity] = useState('');
+    const [phone, setPhone] = useState('');
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const navigate = useNavigate();
@@ -22,16 +29,42 @@ const RegistrationPage = () => {
         const auth = getAuth();
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            console.log('User registered:', userCredential.user);
+            const user = userCredential.user;
+
+            // Store user details in Firestore
+            await setDoc(doc(db, "users", user.uid), {
+                firstName: firstName,
+                lastName: lastName,
+                role: role,
+                email: email,
+                address: address,
+                city: city,
+                phone: phone,
+            });
+
+            console.log('User registered:', user);
             setSuccess(true);
             setError(null);
             alert("Registration successful!");
             navigate('/login');
 
         } catch (err) {
-            setError(err.message);
+            // Map Firebase error codes to user-friendly messages
+            let message;
+            switch (err.code) {
+                case 'auth/email-already-in-use':
+                    message = 'This email is already in use.';
+                    break;
+                case 'auth/weak-password':
+                    message = 'Password should be at least 6 characters.';
+                    break;
+                default:
+                    message = 'Registration failed. Please try again.';
+            }
+            setError(message);
         }
     };
+
 
     return (
         <div style={styles.container}>
@@ -39,6 +72,26 @@ const RegistrationPage = () => {
             {error && <p style={styles.error}>{error}</p>}
             {success && <p style={styles.success}>Registration Successful!</p>}
             <form onSubmit={handleSubmit} style={styles.form}>
+                <div style={styles.formGroup}>
+                    <label>First Name:</label>
+                    <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                        style={styles.input}
+                    />
+                </div>
+                <div style={styles.formGroup}>
+                    <label>Last Name:</label>
+                    <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                        style={styles.input}
+                    />
+                </div>
                 <div style={styles.formGroup}>
                     <label>Email:</label>
                     <input
@@ -65,6 +118,43 @@ const RegistrationPage = () => {
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        style={styles.input}
+                    />
+                </div>
+                <div style={styles.formGroup}>
+                    <label>Role:</label>
+                    <select value={role} onChange={(e) => setRole(e.target.value)} style={styles.input}>
+                        <option value="customer">Customer</option>
+                        <option value="tailor">Tailor</option>
+                    </select>
+                </div>
+                <div style={styles.formGroup}>
+                    <label>Address:</label>
+                    <input
+                        type="text"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        required
+                        style={styles.input}
+                    />
+                </div>
+                <div style={styles.formGroup}>
+                    <label>City:</label>
+                    <input
+                        type="text"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        required
+                        style={styles.input}
+                    />
+                </div>
+                <div style={styles.formGroup}>
+                    <label>Phone:</label>
+                    <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
                         required
                         style={styles.input}
                     />
@@ -123,6 +213,5 @@ const styles = {
         fontWeight: 'bold'
     }
 };
-
 
 export default RegistrationPage;

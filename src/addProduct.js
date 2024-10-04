@@ -1,0 +1,44 @@
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from './firebase'; // Make sure db is your initialized Firestore instance
+
+const addProducts = async () => {
+    const products = [
+        {
+            name: 'Custom Blouse',
+            description: 'A beautiful custom blouse tailored to your fit.',
+            price: 45.99,
+            image_url: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhIQExISFRUVFhMaFxYSGBsYGhYWGBcWGBoWFxUYHSggGBomGxgVITEhJSorLi8uFyEzODMtNygtLisBCgoKDg0OGxAQGy0lICY3KzUtNTUvKy0vLy0vLSstLS8tLS0tLS0tLS0tLystLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAOEA4QMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAAAwQCBQYBB//EAEQQAAEDAgQCBwMICQEJAAAAAAEAAhEDIQQSMUFRYQUGEyIycYFCUpEUI2JygpKhsRYzNFNzssHR8IMVJENjdISis8L/xAAZAQEAAwEBAAAAAAAAAAAAAAAAAQIDBQT/xAAsEQACAgEDAwMCBgMAAAAAAAAAAQIRAxIhMQRBURMiYVLwBRSBodHhFSMy/9oADAMBAAIRAxEAPwD7iiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiLwGUB6iIgCIiAIiIAiIgCIiAIiIAiIgCIqnSvSNPD0n16roYwXgSSSYDWtF3OJIAAuSQEBNisSymx1So5rGNEuc4wAOZK5PFdZq1YH5MzsmTAqVmy944spSMnIvv9Ba2tXfiXitiBGUzSozLaXAuiz6sau0GjdybRxLWQ1t6hEk6im06GDYvOw21Owdzs3V26g/1N44/J5TwFY959eq58T36hDo4imyGs9AFverOOc7tKD3F7qYpua46mnUzZQ47uDmPE8MsyZK5ytjnWY32jJ3JG73u1NrDmRaAYv9XMTGKa027Si5oPF1NwcG+eV7yBwY7gs+lyy9VW+SckVpOxREXVPOEREAREQBEUOMxLaVN9V5hrGuc48GtBJPwCA0PWCiamIpUXPcKZpVHBjSQHOY5gdnjxCHsgG2vJc3iMBh2viaDHSWtP6t06Q2pDe99UrdsfUIdXfHb1W91kg9nTEEU2D2omXO3ceGUDUPbIIIkGxB34ggrjdTlTyWrPVCNRNlhOlq+GMVu0q0uBGaqwe80i9Vo3aZdrBdZp67D12va17HBzXAEOaZBB3BXziiewAABdQGtPU0h71HfKP3ekeGIg73BYlmFArMeH4aqczg05srnX7enGrSILgNfGLzm9fTZ217na8/yZ5IeDrkWLHggOBBBAIIuCDoQdwsl7jEIiIAiIgCIiAIiIAiIgPHOAEmwGpK+e9JY04uq2ubUaZPYMPtGI+UO5kSGjZrp1dA3PXjHSGYJpM1pdVjbDtIzgnbOSKfMOfGi0q5/XZ9K0LvybYoXuw5+UZok6NB3cdAeWpPIFYUaeUakkklzjq5x1cf7bAACwV/o7Cte4ZpIBAABiSTe31RrtfiocXRyPLb24/5ouc4NQUuxve9GNDDl0wBYd4mwAG5PxWeEDKhqMJdla6mM4GWKly003TmD22MwLOBuCoek6xdko0iQyAS6NDN3Xs52mUGwMkgwF7IADWiGt0Gu8kkm5cTJJNyTKKoq+45Oy6v4t1XDUKr4zPpsc4jQktEkcjr6rYLhuhusL8OylhDSDgwBlJ+fLmY0Q1neEdqAIhzmh0Ag3Ibsnda3Zj/ALs7JcA9o3PPFzPCG8w4nlsu1HqMelPUeVwlfB06Lm6XWZ0d6i0H6NWfzYP84KpU6z4gyG0qDZ0Lnufk5loa3PI2lscSo/NYvqHpy8HXouRqdP4ixDqB0lvZvE8TnL+7OwgxzUY6z4lsg0qNTMe6Wk0xTvfOHFxeInwwZAEAEuELq8PkenLwdkqXTdemyhWdVvTyODhrmzDLkA3LiQ0DckBc27rDiYc4uwrIG7Khgi5eTnAiPZ9c2y1Rx9fE5alctytJNNlNpY21hVcHOJLjciTYOFpkmJ9ZjUbTslYpWbPsXluGp1HWNNgzN/fho0cLibkO+jxIWOPZrmINRkZi3R40zaWcDAI5+grOeS005dBiI1FwQW8CHAEHiFG7PJD/ABSZ8+PJcuU4uHG56EnZ4saOHc0OIJyF8gbNeRJy8J1jiTxt6tnhcWA2XHRsQAARNpE6uA/NUxpO03RLJOqnSXZuGEd4HSaB4ES51H0EubyDhYNE9avnNenPhcWkEFjhq1zTLXAaSCAY020XadA9KDEUg4gNe05ajR7LwATH0SCHA8HBdTo8+uOl8o8+WFO0bJERe0yCIiAIiIAiIgCwq1A1pc4gNaCSTYAC5JPBZrluvuJllLBg/tDj2n8CnBqDmHONOmeVU8FWclGLk+xKVujnaGINZ9TFvBBrkFocILKLZFJkG4OUl5Gzqj1ew1DNJMgXAIEy7YQoFYwmLLDIAIkE8TG08FwNanPVM9lUqR5WbkeQ0m28FpuOBuFC5xNySfNZVHlxkkk87rECbKjdvbgk9psJIaNSYUuIwrmQSLGNOJEx5pkfTOYtggkCRIn1sVF0p0jndRpNaGm5nUim0DN594tH21dRjpd8kW7JKXR/bNc0gZYg5tCdhyK11Yvw7iyqS6mDAqmQWjbtJ2+n973jscPiCwyI21HAg/0XmJrF5Jdefy4eSXHTXcb2Rq18gdkz8piCTFoNtj/RaTsnUP1bS+lvTHip86c+Jv0NvZ2attgelpYDSc3KRAc3WxMzwdMgg6QkVFby4DvsRNPHTdbPpBtIUyczGlp2gzAGrhpbfSy19CiXmG6wT8FVr0c9QsBDqbTdw8NR41AO7WnWNTbYgzC1F7bB8mFNhqw5wOTVrSPFwe8fk3bU3gN2+AgOJIBhpIk2NrgzqqloOqmpYRzhnkAXgncj2Y1lRBu9kHwWKzmNqgscwtI3bIbYXEalYdIVGkNEy4awPFmAJcXceS1WBPcjg+q37tRzf6K3TpEhxHsxPqYtxVpTbuKRCXcwQDkikw1bI7N5yJiZ2JGyxVXuWGIoFhg/EaHyKdH4/wCT1m1jam4Blbkye7UP1HEzwa952CmxuLzhrb93cnWw22VRwBsRY7Faqfp5NUCrWpUz6Ii5rqZ0gS12EeSX0QMhJJL6Bs0knVzSCw6mzSfEulXehNTipI8jVOgiIrEBERAEREAXz/pPE9ti69WZawigzh82SajhwJqOc0/wgvoC+X9DumjTcdXjOfrPJc4/EleLr5tY68muFe43vR2XKQ4gDVw1kNIi0WudjJuqWIdLnEQbnQQPQbKNerlSncUj0Jb2eKXDOaHS7S82n4c+a9wlIOdBNuA1PJvNZ4zDZMovJE3Fo2g780UWlqDfYkx9VpDGiTABLi4m5FxB0MrR4c5sRWdtTZTYOTjNR/xBpfdWwWu6EEtqVY/W1arvMA9mw/cYxS5arkxVbHTYNgLIIEFpByeJxHeyy7cBapLxvC8UTnqSVcBKiSh4mzGo8WnrCy6V6LFqtM9lVLodlANM2kdqyxcYI7wIdaJiyhXrp3n1UwyaYtBqyvhmVS7LWyNZJDhRJc5wB2eQMk8pImzlexFYODABlDWhoaPCIt3RsIhe4XDF8QQLgc77gbqKqzKSDNuIg/BHKWn4G1mJKt4PFtZBLbg6ixgzMnjpCpq0MEcrnTMBp7ve1nUjSACoxuV3EOu5rMK7v123tVJE6kPa18n7TnfBbnB4/KBM90EC/Eiw4bm60kRXBvFSmZ5Gm6R8RUd91XFKm4vUvv7YpPYyd3nW3O/M7lS18G5jWucLOn081DTeQQ4ajRT4rFl+oAvOp4bqFpp3yN7KyLZYXs8olrTIOaXXGUzmiJE8BsqFTxHTU6aa7cklCknYTIRiOxq0cQLdm8B+00qhDKkngAQ/zpBfR1weM6KzUnguaQ4Pa6CIykRrvMmy6vq7ijVwuHqu8T6VMu+sWjN+MrqdDqUXGX3Zhlq7RsURF7jEIiIAiIgC+aYNmXtKZt2dauz7Larwz4syn1X0tfO6/wC0Yz/qD/6qR/MleHr1/rT+TXD/ANBEUdCpmAePA7wH3h74+idjvE6QTyKPSSDEFhblN3GPQXM8rfEjipK1YuMk8fITew2VSjd73bN7jfS7j96G/wCmp1LbSoEWMr9nTfU9xrnfAEwsejsN2dKlS9xjG8fCACeawxwzZKfvOBP1GEOPoSGt+2rSdgbTEvYabubgQBAiQACWi2x+K1aL0BWnPW7ISonwREkGLggSARJ3JOnmpelHNLgW3sJMyIi0cPJUkTX7dIreyxhcUWaXEzB0m143tI9VHXqlzi478TPpJUanw2Gc8kDYanTynioTlL2jZbkKtjHuylu5EZpM+kbRaFXrUi0lp25RPO+yjRSlHgmkyDE1Aw06x0pPDnTp2ZBZUnypvefQLY9IYXs3QPCbj+ysV8DTNImQLCS6e8CDttP9FU6JqZmHBvMuY3NRcTd9NsCCd3MJDTycwm5K0eNpUyqZAvVb6Ootc4h21wNzFyOGg/FZdIYQh/daYJEC1ifZtoqem9Oom96KKK3/ALOqQDl2PpBiDO6qgHgquLXKJsnfinOta/ARIgCPwC6HqWZwOGd79MPH1Xy4fgQuN6UzdjUDDleWuDXe6SIDvSZ9F9Jw1BtNjabRDWNa1oGzWiAPgF0+gt6pNmGbsiRERdEwCIiAIiIAvnbGuFWuXAOccRXJa2NO0dlac5aJyBkyR62X0Ra3pPoOhX7z6YzxAqM7tQRpFRt45G3JYdRheWNJl4S0uzisZh6dZ/aNqh2HeAXUgDmL2911Jxn5tlhmbEzmG5Uz6knM7TeNgNgOEKxjOg8TQMgfKaXFoDazdPFT8NTcktg6AMKhoY5jvDleAQHNeGtc0+bGgtI91zb8lysuKcXUtkeiMk+CjhKoGVh8ZZnfGxcZcTwl5dHGDwVleMo02Atptytkm5LidAC5ziSbAAXsBAWrxhfXDGsDm4ao4h1bTtgGlxp0dywgQamkGGyTLctOttrgtdItYB/aE1vZdZnOmD4h9YyeYyroMTh6fZkiGkZdbl3dzAGNCZ/Ba2hQLiGNG1gLWA2WVWgWmJBsLjTynipjKk3Wwa+SMBW8A1uYSJ1O0WE3naJVY/5xlS0cM54zWDRIzOMAGJVYc7Kw+CXpSi1rhlIuB3RtYaneZVJEVZy1O0qJSpBS0KxbJEXEX/PzUSvdGmJPdkXk6hoBzEWjSdd4U41cluQ+CvicQ57szjf8uQUQUuMYA9wbptBm0ayogolep2SuCWth3NALt5tuItcbKpiKbjlcx2Soxwcx0SA4SCHDdrgS0jgTEGCNnWxgLCwB3egm896dDNyIDfUKirSqMriyFutzGnjxVJcG5KjY7SnM5HXuD7THRLXb8iCBjVqhlTtzY1HNbVdfvAgNpkgWJD+zAOwLhurFPo41WVqlJs16IYWgWzscXF9GSQDma2QCYDgxypYt8/M9lXe90fNspuzz4gSSA1mg7ziBO629Ke0ktmV1Lh9jYdJ4ucNXMAEuYXATemHNLwBzYHjnKxEOaKRs1z++Q4t7jWPIAc24OcM0WeH6Ex7zJo4ek3/mVi5482U2Zfg9bPDdUCf2iu549ygDRaRwLszn/BzfJbR6bNJptFXOC4NN07XFRzsPh2h+Ic1wyU5dlLmw19QgZadPfMYmCLmAfoDGwAOAUGAwFKizs6VNlNtzlYA0SdSY1JOp1KsroYsSx2+7MJSsIiLYqEREAREQBERAFVxnRtGrBqUqbyNC9oJHkSJHorSIDQnqnQk96tkLXNNPtCQcwIJzn5wGDs6OSr9dKMU8KWgBrK4BiwDXUqrAAPrOphdMtN1yoZ8FiYEuZTNRo4vpEVWf+TGrOWOLg4pcllJ3ZzOHcA4SJG/LmOasYzFBwa0ZgGyIOkTYjnGqhwtMvEtIju7xObSBuscQzK4t4HhE+hXCTkofDPXtZG4q1gsS1ly24IIje95vFhMeaqqwzCOILrRlkRcm8RA0UQ1XcQ67kWIqZnOdJMk66+sKNEVG7dkhetEmBqV4reArhpM8Wnb2b8JnbbVTFJumGVXCCQdQvFPjXtLyWgAbQCJ5wVAklToItPwTg0u1gwctxEAzI81VVmpjXFpaYvEneZ/tAjkq07lWnpv2kK+5vuobPmsRU17TE1I/0206JH3qTvxXTLSdSsNkwVCxGcPqkHUGs91Yg85et2u/jjpikeNu3YREVyAiIgCIiAIiIAiIgCIiAIiIAosVSzsez3muHxBClRAfO+h8UWMaD4gynmbwdlBGbcazHkpsXXL3FxnkCZgcJXYY/ojD1iHVqFKoRoXsDiBwBIkKk7qngz/wY+q+o3+VwXOl0UnspbG6yrwcurlHpAtbG8QCLRwiB5+crbnqZg/cqjyxFcfgKi8/QzC7fKB/3Nc/g6oQqx6HJHeMg8qfKOcRdF+iNLatiR9sH+ZpXtPqlTGtfEO8ywfixgKy/IZPKLetE51IXWUerWGb7DnfxKj3D4OdH4KcdB4WI+TUI/ht/srr8Pl3kQ8y8HGQkLr39W8GdcHhT50aZ/8AlQO6pYI2GFpN/hjJ8CyIU/45/V+39j1vg5ZQY9ssNP8AeFtMedVwpj+ZdP8AoRhNjigOAxWIj0mpZWsB1WwtJ7ajabnPYZa6tVqVS0wRLe1e7KYJEjikfw9qVth5lXBuWiLCwC9RF1DzhERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAf/9k='
+        },
+        {
+            name: 'Elegant Suit',
+            description: 'A stylish suit designed for formal occasions.',
+            price: 89.99,
+            image_url: 'https://your-image-url-2.jpg'
+        },
+        {
+            name: 'Casual Wear',
+            description: 'Comfortable casual wear for daily use.',
+            price: 35.99,
+            image_url: 'https://your-image-url-3.jpg'
+        },
+        {
+            name: 'Wedding Attire',
+            description: 'Beautiful custom wedding attire for your special day.',
+            price: 199.99,
+            image_url: 'https://your-image-url-4.jpg'
+        }
+    ];
+
+    try {
+        // Loop through the array of products and add them to Firestore
+        products.forEach(async (product) => {
+            await addDoc(collection(db, 'products'), product);
+            console.log('Product added: ', product.name);
+        });
+    } catch (error) {
+        console.error('Error adding product: ', error);
+    }
+};
+
+// Call this function when you need to add products
+addProducts();
